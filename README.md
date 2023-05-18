@@ -1,3 +1,3 @@
 # AffinityMaster
 
-Work in progress, not yet complete
+Work in progress, usable now
