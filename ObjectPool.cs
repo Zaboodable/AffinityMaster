@@ -8,7 +8,6 @@ namespace AffinityMaster
 {
     public class ObjectPool<T>
     {
-        public static ObjectPool<T> Instance = new ObjectPool<T>();
         private Stack<T> _stack;
 
         public ObjectPool()
