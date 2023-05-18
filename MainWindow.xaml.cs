@@ -32,20 +32,21 @@ namespace AffinityMaster
 
         private void button_Search_Click(object sender, RoutedEventArgs e)
         {
-            // Find processes by name
-            string[] names = textBox_Search.Text.Split('\n');
+
 
             // Clear existing panels
             // Actually clear the panels
+            // Object pool used because memory go up
             for (int i = 0; i < _affinityPanels.Count; i++)
             {
                 var panel = _affinityPanels[i];
                 stack_ProcessPanel.Children.Remove(panel.Border);
-                panel.Disable();
                 _panelPool.Push(panel);
             }
             _affinityPanels.Clear();
 
+            // Find processes by name
+            string[] names = textBox_Search.Text.Split(Environment.NewLine);
 
             List<Process> processes = new List<Process>();
             for (int i = 0; i < names.Length; i++)

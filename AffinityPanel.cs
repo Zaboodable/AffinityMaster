@@ -25,11 +25,6 @@ namespace AffinityMaster
             this._process = process;
             this._label_processInfo.Content = $"{_process.Id} | {_process.ProcessName}";
         }
-        public void Disable()
-        {
-            this._process = null;
-            this._label_processInfo.Content = "No process";
-        }
 
         static int debug_Total = 0;
         public AffinityPanel(Process process)
