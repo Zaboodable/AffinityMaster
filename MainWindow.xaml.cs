@@ -32,8 +32,6 @@ namespace AffinityMaster
 
         private void button_Search_Click(object sender, RoutedEventArgs e)
         {
-
-
             // Clear existing panels
             // Actually clear the panels
             // Object pool used because memory go up
@@ -66,7 +64,6 @@ namespace AffinityMaster
             }
         }
 
-
         private void CreateProcessPanel(Process process)
         {
             AffinityPanel panel;
@@ -76,14 +73,15 @@ namespace AffinityMaster
                 // Get panel from pool and update
                 panel = _panelPool.Next;
                 panel.SetProcess(process);
-            } 
+            }
             else
             {
                 // If pool is empty, create new panel
                 panel = new AffinityPanel(process);
             }
 
-            if (panel != null) {
+            if (panel != null)
+            {
                 if (stack_ProcessPanel.Children.Contains(panel.Border) == false)
                 {
                     stack_ProcessPanel.Children.Add(panel.Border);
@@ -92,6 +90,35 @@ namespace AffinityMaster
             }
 
 
+        }
+
+        private void textBox_Search_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
+            {
+                if ((Keyboard.GetKeyStates(Key.LeftShift) & KeyStates.Down) > 0)
+                {
+                    e.Handled = true;
+                }
+            }
+        }
+
+        private void textBox_Search_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
+            {
+                if (e.IsRepeat)
+                {
+                    e.Handled = true;
+                } else
+                {
+                    if ((Keyboard.GetKeyStates(Key.LeftShift) & KeyStates.Down) > 0)
+                    {
+                        button_Search_Click(sender, e);
+                        e.Handled = true;
+                    }
+                }
+            }
         }
     }
 }

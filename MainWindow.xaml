@@ -11,10 +11,11 @@
             <DockPanel LastChildFill="True">
                 <Border BorderBrush="Red" BorderThickness="1" DockPanel.Dock="Top" MinHeight="96">
                     <DockPanel>
-                        <TextBox x:Name="textBox_Search" TextWrapping="Wrap" AcceptsReturn="True" VerticalAlignment="Stretch" MinWidth="80" Width="128" Margin="4,4,4,4"/>
+                        <TextBox x:Name="textBox_Search" TextWrapping="Wrap" AcceptsReturn="True" VerticalAlignment="Stretch" MinWidth="128" Width="256" Margin="4,4,4,4" KeyDown="textBox_Search_KeyDown" PreviewKeyDown="textBox_Search_PreviewKeyDown"/>
                         <StackPanel>
                             <Button x:Name="button_Search" MinHeight="24" MaxHeight="24" Content="Search" Click="button_Search_Click"/>
                             <Label Content="Enter Process or window, one per line."/>
+                            <Label Content="Click Search or press Shift + Enter to search"/>
                         </StackPanel>
                     </DockPanel>
                 </Border>

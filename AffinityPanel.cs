@@ -20,6 +20,11 @@ namespace AffinityMaster
         private Process? _process;
         private Label _label_processInfo;
 
+        private Button _button_Apply;
+        private Button _button_All;
+        private Button _button_None;
+
+
         public void SetProcess(Process process)
         {
             this._process = process;
@@ -31,9 +36,10 @@ namespace AffinityMaster
         {
             debug_Total++;
             System.Diagnostics.Debug.WriteLine($"Creating new AffinityPanel, total: {debug_Total}");
-            this._process = process;
-            this._checkBoxes = new List<CheckBox>();
-            this._comboBoxes = new List<ComboBox>();
+            _process = process;
+            _checkBoxes = new List<CheckBox>();
+            _comboBoxes = new List<ComboBox>();
+
 
             // Main border for this process
             Border = new Border();
@@ -41,13 +47,87 @@ namespace AffinityMaster
             Border.BorderBrush = System.Windows.Media.Brushes.Orange;
             Border.Margin = new Thickness(2);
 
+            // Main stack for process info and cpu selection
             var stack_content = new StackPanel();
             stack_content.Orientation = Orientation.Horizontal;
 
+            // Process Label and buttons
             _label_processInfo = new Label() { Content = $"{_process.Id} | {_process.ProcessName}" };
-            var border_panel = CreateCpuSelectionPanel();
+            _button_Apply = new Button();
+            _button_Apply.Content = "Apply";
+            _button_Apply.Margin = new Thickness(2);
+            _button_All = new Button();
+            _button_All.Content = "All";
+            _button_All.Margin = new Thickness(2);
+            _button_None = new Button();
+            _button_None.Content = "None";
+            _button_None.Margin = new Thickness(2);
 
-            stack_content.Children.Add(_label_processInfo);
+            // Apply affinity
+            _button_Apply.Click += (s, e) =>
+            {
+                // Get selected cpus
+                var selectedCpus = new List<int>();
+                foreach (var checkbox in _checkBoxes)
+                {
+                    if (checkbox.IsChecked == true)
+                    {
+                        selectedCpus.Add((int)checkbox.Tag);
+                    }
+                }
+
+                // Set affinity if at least one cpu is selected
+                if (selectedCpus.Count > 0)
+                {
+                    var affinity = 0;
+                    string cpus = "";
+                    for (int i = 0; i < selectedCpus.Count; i++)
+                    {
+                        affinity = affinity | (1 << selectedCpus[i]);
+                        cpus += $"{selectedCpus[i]}{(i < selectedCpus.Count - 1 ? ", ":"")}";
+                    }
+
+                    IntPtr affinityPtr = new IntPtr(affinity);
+                    _process.ProcessorAffinity = affinityPtr;
+
+
+                    // Must have at least one cpu selected
+                    MessageBox.Show($"Applied affinity to selected process (CPUs {cpus})", "Mighty Success");
+                } 
+                else
+                {
+                    // Must have at least one cpu selected
+                    MessageBox.Show("Must have at least one CPU selected", "Mighty Error");
+                }
+            };  
+
+            // Check all checkboxes
+            _button_All.Click += (s, e) =>
+            {
+                foreach (var checkbox in _checkBoxes)
+                {
+                    checkbox.IsChecked = true;
+                }
+            };
+
+            // Uncheck all checkboxes
+            _button_None.Click += (s, e) =>
+            {
+                foreach (var checkbox in _checkBoxes)
+                {
+                    checkbox.IsChecked = false;
+                }
+            };
+
+            var stack_process = new StackPanel();
+            stack_process.Children.Add(_label_processInfo);
+            stack_process.Children.Add(_button_Apply);
+            stack_process.Children.Add(_button_All);
+            stack_process.Children.Add(_button_None);
+            stack_content.Children.Add(stack_process);
+
+            // Cpu selection panel
+            var border_panel = CreateCpuSelectionPanel();
             stack_content.Children.Add(border_panel);
             Border.Child = stack_content;
         }
@@ -135,10 +215,6 @@ namespace AffinityMaster
                                 _checkBoxes[k].IsChecked = k >= map[0] && k <= map[1];
                             }
                         };
-                        comboBox.DropDownOpened += (s, e) =>
-                        {
-                            //ResetComboSelection();
-                        };
                     }
                     stack_cpuButtons.Children.Add(stack_divisorCombo);
                 }
@@ -180,6 +256,7 @@ namespace AffinityMaster
             var checkBox = new CheckBox();
             checkBox.Content = "CPU " + i;
             checkBox.Name = "cpu" + i;
+            checkBox.Tag = i;
             checkBox.Margin = new Thickness(4);
             return checkBox;
         }
